@@ -1,0 +1,7 @@
+*.o
+*.exe
+*.out
+*.d
+*.ptx
+*.cubin
+*.fatbin
