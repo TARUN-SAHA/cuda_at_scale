@@ -17,13 +17,14 @@ Build steps:
 * make clean build
 
 Usage: Output will be saved in data/output directory with same as input image filename.
-# default execuation (process all images in data/images directory)
+# default execution (process all images in data/images directory)
 ./bin/edgeDetector (or 'make run')
 # process a single image
 ./bin/edgeDetector -input ./<image_path>
 # process all files in directory
 ./bin/edgeDetector -input ./<image directory>
 
+# Image format
 Input Image format: JPEG
 Output Image format: JPEG
 
