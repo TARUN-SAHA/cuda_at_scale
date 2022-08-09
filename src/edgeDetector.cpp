@@ -149,10 +149,6 @@ static int detectEdges(char* input, std::string output)
 
     saveImage(output, oHostDst);
 
-
-    nppiFree(oDeviceSrc.data());
-    nppiFree(oDeviceDst.data());
-
     cudaDeviceSynchronize();
 
     return 0;
