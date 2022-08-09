@@ -189,7 +189,7 @@ int main(int argc, char *argv[])
             {
                 if (entry.path().filename().string().rfind(".jpg"))
                 {
-                    std::string sOuputFile = "data/output/" + entry.path().filename().string();
+                    std::string sOutputFile = "data/output/" + entry.path().filename().string();
                     if (-1 == detectEdges(entry.path().string().data(), sOutputFile))
                     {
                         std::cerr << "Edge detector failed !!! \n";
@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
         }
         else if (fs::is_regular_file(filePath))
         {
-            std::string sOuputFile = "data/output/" + fs::path(filePath).filename().string();
+            std::string sOutputFile = "data/output/" + fs::path(filePath).filename().string();
             if (-1 == detectEdges(filePath, sOutputFile))
             {
                 std::cerr << "Edge detector failed !!! \n";
