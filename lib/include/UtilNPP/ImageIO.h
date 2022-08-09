@@ -58,6 +58,7 @@ namespace npp
 
         NPP_ASSERT(pBitmap != 0);
         // make sure this is an 8-bit single channel image
+        pBitmap = FreeImage_ConvertToGreyscale(pBitmap);
         NPP_ASSERT(FreeImage_GetColorType(pBitmap) == FIC_MINISBLACK);
         NPP_ASSERT(FreeImage_GetBPP(pBitmap) == 8);
 
@@ -104,7 +105,7 @@ namespace npp
 
         // now save the result image
         bool bSuccess;
-        bSuccess = FreeImage_Save(FIF_PGM, pResultBitmap, rFileName.c_str(), 0) == TRUE;
+        bSuccess = FreeImage_Save(FIF_JPEG, pResultBitmap, rFileName.c_str(), 0) == TRUE;
         NPP_ASSERT_MSG(bSuccess, "Failed to save result image.");
     }
 

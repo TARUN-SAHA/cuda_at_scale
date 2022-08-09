@@ -271,13 +271,14 @@ ifeq ($(TARGET_OS),qnx)
   SAMPLE_ENABLED := 0
 endif
 
+BIN_DIR := ./bin
 ALL_LDFLAGS :=
 ALL_LDFLAGS += $(ALL_CCFLAGS)
 ALL_LDFLAGS += $(addprefix -Xlinker ,$(LDFLAGS))
 ALL_LDFLAGS += $(addprefix -Xlinker ,$(EXTRA_LDFLAGS))
 
 # Common includes and paths for CUDA
-INCLUDES  := -I./common
+INCLUDES  := -I./lib/include
 LIBRARIES :=
 
 ################################################################################
@@ -303,7 +304,7 @@ endif
 
 ALL_CCFLAGS += --threads 0
 
-INCLUDES += -I./common/UtilNPP
+INCLUDES += -I./lib/include/UtilNPP
 
 LIBRARIES += -lnppisu_static -lnppif_static -lnppc_static -lculibos -lfreeimage -lstdc++fs
 
@@ -326,7 +327,7 @@ endif
 # Target rules
 all: build
 
-build: edgeDetector
+build: $(BIN_DIR)/edgeDetector
 
 check.deps:
 ifeq ($(SAMPLE_ENABLED),0)
@@ -335,23 +336,23 @@ else
 	@echo "Sample is ready - all dependencies have been met"
 endif
 
-#$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
-edgeDetector.o:edgeDetector.cpp
+$(BIN_DIR)/edgeDetector.o:src/edgeDetector.cpp
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) -o $@ -c $<
 
 
-#$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
-edgeDetector: edgeDetector.o
+$(BIN_DIR)/edgeDetector: $(BIN_DIR)/edgeDetector.o
 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) -o $@ $+ $(LIBRARIES)
 	$(EXEC) mkdir -p ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
 	$(EXEC) cp $@ ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
+	$(EXEC) mkdir -p ./data/output
 
 run: build
-	$(EXEC) ./edgeDetector
+	$(EXEC) $(BIN_DIR)/edgeDetector
 
 clean:
-	rm -f edgeDetector edgeDetector.o
+	rm -f $(BIN_DIR)/edgeDetector $(BIN_DIR)/edgeDetector.o
 	rm -rf ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)/edgeDetector
+	rm -rf ./data/output
 
 clobber: clean
 

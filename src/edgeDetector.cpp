@@ -55,20 +55,20 @@ bool printfNPPinfo(int argc, char *argv[])
 
 static int detectEdges(char* input, std::string output)
 {
-    std::ifstream(input, std::ifstream::in);
+    std::ifstream infile(input, std::ifstream::in);
     if (infile.good())
     {
-        std::cout << "EdgeDetector opened: <" << filename << "> successfully!" << std::endl;
+        std::cout << "EdgeDetector opened: <" << input << "> successfully!" << std::endl;
         infile.close();
     }
     else
     {
-        std::cout << "EdgeDetector unable to open: <" << filename << ">" << std::endl;
+        std::cout << "EdgeDetector unable to open: <" << input << ">" << std::endl;
         infile.close();
         return -1;
     }
 
-    string sFilename(input);
+    std::string sFilename(input);
     // Declare a host image object for an 8-bit grayscale image (nppiFilterCannyBorder_8u_C1R takes 8-bit single-channel/grayscale image as input)
     npp::ImageCPU_8u_C1 oHostSrc;
     npp::loadImage(sFilename, oHostSrc);
@@ -101,9 +101,9 @@ static int detectEdges(char* input, std::string output)
 
         return -1;
     }
-    catch
+    catch(...)
     {
-        std::cerr << "Program error! An unknow type of exception occurred. \n;
+        std::cerr << "Program error! An unknow type of exception occurred. \n";
         return -1;
     }
 
@@ -111,7 +111,7 @@ static int detectEdges(char* input, std::string output)
 
     // Set the low and high threshold, ratio of high to threshold limit be in the ratio of (2 or 3) / 1
     Npp16s nLowThreshold = 85;
-    Npp16s nHighThreshold = 256;
+    Npp16s nHighThreshold = 255;
 
     if (nBufferSize > 0 && pScratchBufferNPP != 0)
     {
@@ -119,7 +119,7 @@ static int detectEdges(char* input, std::string output)
         {
             NPP_CHECK_NPP(nppiFilterCannyBorder_8u_C1R(oDeviceSrc.data(), oDeviceSrc.pitch(),
                         oSrcSize, oSrcOffset,
-                        oDeviceDst.data(), oDeviceDst.pitch(),
+                        oDeviceDst.data(), oDeviceDst.pitch(), oSizeROI, 
                         NPP_FILTER_SOBEL, NPP_MASK_SIZE_3_X_3,
                         nLowThreshold, nHighThreshold,
                         nppiNormL2, NPP_BORDER_REPLICATE, pScratchBufferNPP));
@@ -131,9 +131,9 @@ static int detectEdges(char* input, std::string output)
             std::cerr << "Aborting." << std::endl;
             return -1;
         }
-        catch
+        catch(...)
         {
-            std::cerr << "Program error! An unknow type of exception occurred. \n;
+            std::cerr << "Program error! An unknow type of exception occurred. \n";
             return -1;
         }
     }
@@ -145,13 +145,15 @@ static int detectEdges(char* input, std::string output)
     npp::ImageCPU_8u_C1 oHostDst(oDeviceDst.size());
 
     // Copy to host destination from device 
-    oDeviceDst.copy(oHostDst.data(), oHostDst.pitch());
+    oDeviceDst.copyTo(oHostDst.data(), oHostDst.pitch());
 
     saveImage(output, oHostDst);
 
 
     nppiFree(oDeviceSrc.data());
     nppiFree(oDeviceDst.data());
+
+    cudaDeviceSynchronize();
 
     return 0;
 }
@@ -178,17 +180,17 @@ int main(int argc, char *argv[])
         }
         else
         {
-            filePath = sdkFindFilePath("../data/images", argv[0]);
+            filePath = sdkFindFilePath("data/images", argv[0]);
         }
 
         if (fs::is_directory(filePath))
         {
             for (auto &entry : fs::directory_iterator(filePath))
             {
-                if (entry.path().filename().string().rfind('.jpg'))
+                if (entry.path().filename().string().rfind(".jpg"))
                 {
-                    std::string sOuputFile = "../data/output/" + entry.path().filename().string();
-                    if (-1 == detectEdges(entry().path.string().data(), sOutputFile))
+                    std::string sOuputFile = "data/output/" + entry.path().filename().string();
+                    if (-1 == detectEdges(entry.path().string().data(), sOutputFile))
                     {
                         std::cerr << "Edge detector failed !!! \n";
                         exit(EXIT_FAILURE);
@@ -198,7 +200,7 @@ int main(int argc, char *argv[])
         }
         else if (fs::is_regular_file(filePath))
         {
-            std::string sOuputFile = "../data/output/" + fs::path(filePath).filename().string();
+            std::string sOuputFile = "data/output/" + fs::path(filePath).filename().string();
             if (-1 == detectEdges(filePath, sOutputFile))
             {
                 std::cerr << "Edge detector failed !!! \n";
