@@ -112,7 +112,7 @@ static int detectEdges(char* input, std::string output)
     // Set the low and high threshold, ratio of high to threshold limit be in the ratio of (2 or 3) / 1
     // We can fine tune this parameters for each image's median pixel values.
     Npp16s nLowThreshold = 76;
-    Npp16s nHighThreshold = 160;
+    Npp16s nHighThreshold = 230;
 
     if (nBufferSize > 0 && pScratchBufferNPP != 0)
     {
