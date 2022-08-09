@@ -110,8 +110,9 @@ static int detectEdges(char* input, std::string output)
     cudaMalloc((void**)&pScratchBufferNPP, nBufferSize);
 
     // Set the low and high threshold, ratio of high to threshold limit be in the ratio of (2 or 3) / 1
-    Npp16s nLowThreshold = 85;
-    Npp16s nHighThreshold = 255;
+    // We can fine tune this parameters for each image's median pixel values.
+    Npp16s nLowThreshold = 76;
+    Npp16s nHighThreshold = 160;
 
     if (nBufferSize > 0 && pScratchBufferNPP != 0)
     {
